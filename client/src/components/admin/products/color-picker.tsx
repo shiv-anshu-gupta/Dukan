@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { X } from "lucide-react";
+import { useState } from "react";
 
 const wrapperClass = "space-y-3";
 
@@ -24,18 +26,39 @@ const removeIconClass =
   "h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground";
 
 
-export function ColorPicker(){
+type ColorPickerProps = {
+    colors : string[];
+    onAdd: (color: string) => void;
+    onRemove: (color: string) => void;
+}
 
+export function ColorPicker({colors, onAdd, onRemove} : ColorPickerProps){
+
+    const [selectedColor, setSelectedColor] = useState("#000000");
     return <div className={wrapperClass}>
         <div className={headerClass}>
             <h3 className={titleClass}>Colors</h3>
         </div>
         <div className={actionsRowClass}>
             <Input
+            value={selectedColor}
+            onChange={(e)=> setSelectedColor(e.target.value)}
                 type="color"
                 className={colorInputClass}
             />
-            <Button type="button" variant="secondary">Add Color</Button>
+            <Button onClick={()=> onAdd(selectedColor)} type="button" variant="secondary">Add Color</Button>
+        </div>
+
+        <div className={colorsListClass}>
+            {
+                colors.map(colorItem=>(
+                    <button key={colorItem} onClick={()=> onRemove(colorItem)} className={colorChipClass} type="button">
+                        <span className={colorDotClass} style={{backgroundColor: colorItem}}></span>
+                        <X className={removeIconClass}/>
+                    </button>
+                    
+                ))    
+            }
         </div>
     </div>
 }

@@ -24,13 +24,11 @@ export async function getDbUserFromReq(req: Request){
     return dbUser;
 }
 
-export const requireAdmin = async(req: Request, _res: Response, next: NextFunction)=>{
-    async(req:Request, _res:Response, next:NextFunction)=>{
-        const extractCurrentDbUser = await getDbUserFromReq(req)
+export const requireAdmin = asyncHandler(async (req: Request, _res: Response, next: NextFunction) => {
+    const extractCurrentDbUser = await getDbUserFromReq(req);
 
-        if(extractCurrentDbUser.role !== "admin"){
-            throw new AppError(403,"Admin access only")
-        }
-        next();
+    if (extractCurrentDbUser.role !== "admin") {
+        throw new AppError(403, "Admin access only");
     }
-}
+    next();
+});

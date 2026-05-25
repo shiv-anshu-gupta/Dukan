@@ -30,7 +30,7 @@ adminProductRouter.use(requireAdmin);
 adminProductRouter.get('/categories', asyncHandler(async (req: Request, res: Response)=> {
     const categories = await Category.find({}).sort({name : 1});
 
-    res.json(categories);
+    res.json(ok(categories));
 }))
 
 
@@ -41,7 +41,7 @@ adminProductRouter.post('/categories', asyncHandler(async (req: Request, res: Re
 
     const category = await Category.create({name});
 
-    res.status(201).json(category);
+    res.status(201).json(ok(category));
 }));
 
 adminProductRouter.put('/categories/:id', asyncHandler(async (req: Request, res: Response)=> {

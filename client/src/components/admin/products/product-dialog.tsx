@@ -1,4 +1,4 @@
-import type { Category, Product } from "@/features/admin/products/types";
+import type { Category, Product, ProductStatus } from "@/features/admin/products/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { ColorPicker } from "./color-picker";
 import { SizeSelector } from "./size-selector";
 import { ImagePicker } from "./image-picker";
 import { Button } from "@/components/ui/button";
+import { useProductForm } from "@/features/admin/products/use-product-form";
 
 type ProductDialogProps = {
     open : boolean;
@@ -44,20 +45,30 @@ export function ProductDialog({
     onSaved,
     Product
 } : ProductDialogProps){
+
+    const {form, saving, isEditMode, updateField, toggleSize, addColor, removeColor, addFiles, submit, removeExistingImage, changeCoverImage} = useProductForm({
+        open,
+        product : Product,
+        onSaved,
+        onClose : ()=> onOpenChange(false),
+    })
     return <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className={dialogContentClass}>
             <DialogHeader>
-                <DialogTitle>{Product ? "Edit Product" : "Add Product"}</DialogTitle>
+                <DialogTitle>{isEditMode ? "Update Product" : "Add Product"}</DialogTitle>
             </DialogHeader>
             <div className={contentWrapClass}>
                 <div className={twoColumnGridClass}>
                     <div className={fieldGroupClass}>
                     <Label>Title</Label>
-                    <Input placeholder="Product Title" />    
+                    <Input value={form.title} onChange={(e)=> updateField("title", e.target.value)} placeholder="Product Title" />    
                     </div>
                     <div className={fieldGroupClass}>
                     <Label>Brand</Label>
-                    <Select>
+                    <Select
+                    value={form.brand}
+                    onValueChange={(value)=> updateField("brand", value)}
+                    >
                         <SelectTrigger>
                             <SelectValue placeholder="Brand"/>
                         </SelectTrigger>
@@ -74,15 +85,20 @@ export function ProductDialog({
                     <Textarea
                         rows={5}
                         placeholder="Description"
+                        value={form.description}
+                        onChange={(e)=> updateField("description", e.target.value)}
                     />
                 </div>
                 <div className={twoColumnGridClass}>
                     <div className={fieldGroupClass}>
                     <Label>Title</Label>
-                    <Input placeholder="Product Title" />    
+                    <Input value={form.title} onChange={(e)=> updateField("title", e.target.value)} placeholder="Product Title" />    
                     
                     <Label>Category</Label>
-                    <Select>
+                    <Select
+                    value={form.category}
+                    onValueChange={(value)=> updateField("category", value)}
+                    >
                         <SelectTrigger>
                             <SelectValue placeholder="Category"/>
                         </SelectTrigger>
@@ -97,7 +113,11 @@ export function ProductDialog({
                     </div>
                     <div className={fieldGroupClass}>
                     <Label>Status</Label>
-                     <RadioGroup>
+                     <RadioGroup
+                     value={form.status}
+                     onValueChange={(value)=> updateField("status", value as ProductStatus)}
+                     className={statusGroupClass}
+                     >
                         <div className={statusItemClass}>
                             <RadioGroupItem value="active" id="product-status-active"/>
                             <Label htmlFor="product-status-active">Active</Label>
@@ -113,6 +133,8 @@ export function ProductDialog({
                     <div className={fieldGroupClass}>
                         <Label>Price</Label>
                         <Input
+                        value={form.price}
+                        onChange={(e)=> updateField("price", e.target.value)}
                         type="number"
                         min="0"
                         placeholder="0"
@@ -121,6 +143,8 @@ export function ProductDialog({
                     <div className={fieldGroupClass}>
                         <Label>Sale Percentage</Label>
                         <Input
+                        value={form.salePercentage}
+                        onChange={(e)=> updateField("salePercentage", e.target.value)}
                         type="number"
                         min="0"
                         placeholder="0"
@@ -129,6 +153,8 @@ export function ProductDialog({
                     <div className={fieldGroupClass}>
                         <Label>Stock</Label>
                         <Input
+                        value={form.stock}
+                        onChange={(e)=> updateField("stock", e.target.value)}
                         type="number"
                         min="0"
                         placeholder="0"
@@ -136,14 +162,32 @@ export function ProductDialog({
                     </div>
                 </div>
                 <div className={sectionGridClass}>
-                    <ColorPicker/>
-                    <SizeSelector/>
+                    <ColorPicker
+                    colors={form.colors}
+                    onAdd={addColor}
+                    onRemove={removeColor}
+                    />
+                    <SizeSelector
+                    selectedSizes={form.sizes}
+                    onToggle={toggleSize}
+                    />
                 </div>
-                <ImagePicker/>
+                <ImagePicker
+                    existingImages={form.existingImages}
+                    newFiles={form.newFiles}
+                    coverImagePublicId={form.coverImagePublicId}
+                    onFilesAdd={addFiles}
+                    onExistingRemove={removeExistingImage}
+                    onCoverChange={changeCoverImage}
+                />
 
                 <div className={actionsRowClass}>
                     <Button variant="outline" onClick={()=> onOpenChange(false)}>Cancel</Button>
-                    <Button>Create Product</Button>
+                    <Button onClick={submit} disabled={saving}>
+                        {
+                            saving ? "Saving..." : isEditMode ? "Update Product" : "Create Product"
+                        }
+                    </Button>
                 </div>
 
             </div>

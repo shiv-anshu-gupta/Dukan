@@ -37,6 +37,11 @@ export function useAdminProducts() {
         setProductDialogOpen(true);
     }
 
+    function openEditDialog(product: Product){
+        setEditingProduct(product);
+        setProductDialogOpen(true);
+    }
+
     function closeProductDialog(){
         setProductDialogOpen(false);
         setEditingProduct(null);
@@ -72,6 +77,7 @@ export function useAdminProducts() {
         setEditingProduct,
         openCreateDialog,
         closeProductDialog,
-        refreshAll
+        refreshAll,
+        openEditDialog,
     }
 }

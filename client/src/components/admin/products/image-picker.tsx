@@ -1,4 +1,7 @@
-import { ImagePlus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import type { ProductImage } from "@/features/admin/products/types";
+import { ImagePlus, Star, X } from "lucide-react";
+import { useEffect, useMemo } from "react";
 
 
 
@@ -41,7 +44,27 @@ const removeIconClass = "h-4 w-4";
 const fileNameClass = "p-2 text-xs text-muted-foreground";
 
 
-export function ImagePicker(){
+type ImagePickerProps = {
+    existingImages : ProductImage[];
+    newFiles : File[];
+    coverImagePublicId : string;
+    onFilesAdd : (files: File[]) => void;
+    onExistingRemove : (publicId: string) => void;
+    onCoverChange : (publicId: string) => void;
+}
+
+export function ImagePicker({ existingImages, newFiles, coverImagePublicId, onFilesAdd, onExistingRemove, onCoverChange }: ImagePickerProps){
+    
+    const previewUrls = useMemo(()=>
+        newFiles.map(file=> ({file, url: URL.createObjectURL(file)}))
+    , [newFiles]);
+
+    useEffect(()=>{
+        return ()=>{
+            previewUrls.forEach(item=> URL.revokeObjectURL(item.url))
+        }
+    },[previewUrls])
+
     return (
         <div className={wrapperClass}>
         <div className={headerClass}>
@@ -50,8 +73,61 @@ export function ImagePicker(){
         <label className={uploadLabelClass}>
             <ImagePlus className={uploadIconClass}/>
             <span className={uploadTitleClass}>Upload Product Image</span>
-            <input type="file" className={hiddenInputClass} accept="image/*" multiple/>
+            <input type="file" className={hiddenInputClass} accept="image/*" multiple
+            onChange={(event)=> {
+                if (event.target.files) {
+                    onFilesAdd(Array.from(event.target.files));
+                }
+            }}
+            />
         </label>
+        {
+            existingImages.length > 0 ? <div className={sectionClass}>
+            <p className={sectionTitleClass}>Existing Images</p>
+            <div className={gridClass}>
+                {
+                    existingImages.map(image=> {
+                        const isCover = coverImagePublicId === image.publicId;
+                    
+                        return <div key={image.publicId} className={imageCardClass}>
+                            <img src={image.url} alt="product" className={imageClass}/>
+
+                            <div className={imageActionsClass}>
+                                <Button type="button" size='sm'
+                                variant={isCover ? "default" : "outline"}
+                                onClick={()=> onCoverChange(image.publicId)}>
+                                    <Star className={starIconClass}/>
+                                    {
+                                        isCover ? 'Cover' : 'Set as Cover'
+                                    }
+                                </Button>
+                                <Button type="button" size='icon' variant='ghost' onClick={()=> onExistingRemove(image.publicId)}>
+                                    <X className={removeIconClass}/>
+                                </Button>
+                            </div>
+                        </div>
+                    })
+                }
+            </div>
+            </div> : null
+        }
+
+        {
+            previewUrls.length>0 ?
+            <div className={sectionClass}>
+                <p className={sectionTitleClass}>New Uploads</p>
+                <div className={gridClass}>
+                    {
+                        previewUrls.map((previewItem, index)=> (
+                            <div key={`${previewItem.file.name}-${index}`} className={imageCardClass}>
+                                <img src={previewItem.url} alt={previewItem.file.name} className={imageClass}/>
+                                <div className={fileNameClass}>{previewItem.file.name}</div>
+                            </div>
+                        ))
+                    }
+                </div>
+            </div> : null
+        }
         </div>
     )
 }

@@ -28,7 +28,7 @@ export type Product = {
     colors: string[];
     sizes: string[];
     stock: number;
-    categories: ProductCategory;
+    category: ProductCategory;
     images: ProductImage[];
     status: ProductStatus;
     createdAt: string;
@@ -69,4 +69,20 @@ export type UpdateProductBody = {
     status: ProductStatus;
     existingImages: ProductImage[];
     coverImagePublicId?: string; 
+}
+
+export type ProductFormState = {
+     title: string;
+    description: string;
+    category: string;
+    brand: string;
+    price: string;
+    salePercentage: string;
+    colors: string[];
+    sizes: string[];
+    stock: string;
+    status: ProductStatus;
+    existingImages: ProductImage[];
+    newFiles: File[];
+  coverImagePublicId: string;
 }

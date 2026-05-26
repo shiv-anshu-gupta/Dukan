@@ -3,7 +3,7 @@ import { ProductSize } from "./Products";
 
 
 export type CartItem = {
-    product : string;
+    product : Types.ObjectId;
     quantity : number;
     size : ProductSize;
     color : string;

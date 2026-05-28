@@ -8,6 +8,8 @@ import { notFound } from './middleware/notFound';
 import { clerkMiddleware } from '@clerk/express';
 import { authRouter } from './routes/auth/auth.routes';
 import { adminProductRouter } from './routes/admin/product.routes';
+import { customerProductRouter } from './routes/customer/product.routes';
+import { customerAddressRouter } from './routes/customer/address.routes';
 
 async function mainEntryFunction(){
     await connectDB();
@@ -33,6 +35,8 @@ async function mainEntryFunction(){
     });
     app.use("/auth", authRouter);
 
+    app.use("/customer", customerProductRouter);
+    app.use("/customer", customerAddressRouter);
     app.use("/admin", adminProductRouter);
     app.use(notFound);
     app.use(errorHandler);
